@@ -99,7 +99,7 @@ arRing.renderOrder = 999;
 arRing.visible = false;
 scene.add(arRing);
 
-const AR_SIZE = 0.22;
+const AR_SIZE = 0.18;
 const AR_HINT_IDLE = 'Move your phone slowly to find a surface';
 const AR_HINT_FOUND = 'Tap the ring to place the Table Alarm';
 const AR_HINT_PLACED = 'Placed. Exit AR when you are done';
@@ -108,6 +108,7 @@ let modelRoot = null;
 let modelLoaded = false;
 let stationaryTransform = null;
 let currentCameraTarget = new THREE.Vector3(0, 0.50, 0);
+let viewTargetY = 0.50;
 let arSession = null;
 let arHitTestSource = null;
 let arPlaced = false;
@@ -152,7 +153,7 @@ function viewDistance() {
 }
 
 function fitInitialCamera(instant = true) {
-  const target = new THREE.Vector3(0, 0.50, 0);
+  const target = new THREE.Vector3(0, viewTargetY, 0);
   const position = new THREE.Vector3(1.18, 0.94, 1.52);
   camera.position.copy(position.normalize().multiplyScalar(viewDistance()));
   controls.target.copy(target);
@@ -165,7 +166,7 @@ function fitInitialCamera(instant = true) {
 
 function resetCamera() {
   if (renderer.xr.isPresenting) return;
-  controls.target.set(0, 0.50, 0);
+  controls.target.set(0, viewTargetY, 0);
   const start = camera.position.clone();
   const end = new THREE.Vector3(1.18, 0.94, 1.52).normalize().multiplyScalar(viewDistance());
   const t0 = performance.now();
@@ -209,9 +210,12 @@ function loadModel() {
       const center = box.getCenter(new THREE.Vector3());
       const maxDim = Math.max(size.x, size.y, size.z) || 1;
       const scale = 1 / maxDim;
+      viewTargetY = (size.y * scale) / 2;
 
-      root.scale.setScalar(scale);
-      root.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale);
+      const wrap = new THREE.Group();
+      wrap.add(root);
+      wrap.scale.setScalar(scale);
+      wrap.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale);
       root.traverse((object) => {
         if (!object.isMesh) return;
         object.castShadow = true;
@@ -224,8 +228,8 @@ function loadModel() {
         }
       });
 
-      modelRoot = root;
-      modelPivot.add(root);
+      modelRoot = wrap;
+      modelPivot.add(wrap);
       modelPivot.position.set(0, 0, 0);
       modelPivot.quaternion.identity();
       modelPivot.scale.setScalar(1);
