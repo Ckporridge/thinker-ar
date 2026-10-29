@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#e7edf4">
+  <meta name="description" content="Table Alarm — view the 3D model and place it in augmented reality.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Table Alarm — 3D &amp; AR</title>
+  <link rel="preload" href="model.usdz" as="fetch" type="model/vnd.usdz+zip" crossorigin>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="scene" touch-action="none"></canvas>
+
+  <div id="ui">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 2.8 21 7.5v9L12 21.2 3 16.5v-9L12 2.8Z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m3.4 7.7 8.6 4.6 8.6-4.6M12 12.3v8.3" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".65"/></svg>
+        </span>
+        <span class="brand-text">
+          <strong>Table Alarm</strong>
+          <small>CID 1 Group 8 · 3D &amp; AR</small>
+        </span>
+      </div>
+      <span class="format-pill">USDZ</span>
+    </header>
+
+    <div id="loading" class="panel loading" role="status" aria-live="polite">
+      <span class="spinner" aria-hidden="true"></span>
+      <div class="loading-text">
+        <b>Loading Table Alarm</b>
+        <span id="loadText">Fetching USDZ model…</span>
+      </div>
+      <div class="progress"><i id="progressBar"></i></div>
+    </div>
+
+    <div id="error" class="panel error" role="alert" hidden>
+      <b>The model could not load.</b>
+      <span id="errorText">Check your connection and reload the page.</span>
+      <button id="retry" type="button">Try again</button>
+    </div>
+
+    <div class="hint" id="hint">Drag to orbit · pinch or scroll to zoom</div>
+
+    <div class="toolbar" role="toolbar" aria-label="Viewer controls">
+      <button id="btnRotate" type="button" class="tool is-on" aria-pressed="true" title="Toggle auto-rotate">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 6.4M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Auto-rotate</span>
+      </button>
+      <button id="btnReset" type="button" class="tool" title="Reset camera">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v6h6M4.6 10a8 8 0 1 1 1.8 6.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Reset</span>
+      </button>
+      <button id="btnFullscreen" type="button" class="tool" title="Fullscreen">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Fullscreen</span>
+      </button>
+    </div>
+
+    <div class="ar-bar">
+      <a id="iosAr" class="ar-cta" rel="ar" href="model.usdz" hidden>
+        <img src="poster.jpg" alt="">
+        <span class="ar-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 3.2 21 8v8l-9 4.8L3 16V8l9-4.8Z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m3.4 8.1 8.6 4.6 8.6-4.6M12 12.7v8" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".6"/></svg>
+        </span>
+        <span class="ar-copy"><b>View in AR</b><small>Open in your room</small></span>
+      </a>
+      <button id="arBtn" class="ar-cta" type="button" hidden disabled>
+        <span class="ar-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 3.2 21 8v8l-9 4.8L3 16V8l9-4.8Z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m3.4 8.1 8.6 4.6 8.6-4.6M12 12.7v8" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".6"/></svg>
+        </span>
+        <span class="ar-copy"><b>View in AR</b><small>Place on a surface</small></span>
+      </button>
+      <p id="arNote" class="ar-note">Open on a phone to use AR.</p>
+    </div>
+  </div>
+
+  <div id="arOverlay" hidden>
+    <div class="ar-topline">
+      <span class="ar-dot" aria-hidden="true"></span>
+      <span id="arInstruction">Move your phone slowly to find a surface</span>
+    </div>
+    <button id="arExit" type="button">Exit AR</button>
+  </div>
+
+  <noscript><div class="noscript">This 3D viewer needs JavaScript enabled.</div></noscript>
+  <script src="viewer.js" defer></script>
+</body>
+</html>
