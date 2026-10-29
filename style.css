@@ -376,7 +376,7 @@ body.ar-active { background: transparent; }
   .brand-text strong { font-size: 17px; }
   .brand-text small { font-size: 10px; }
   .format-pill { font-size: 9px; padding: 6px 8px; }
-  .hint { bottom: calc(190px + var(--safe-b)); font-size: 10px; left: calc(14px + var(--safe-l)); }
+  .hint { display: none; }
   .toolbar {
     align-self: center;
     margin-bottom: 9px;
