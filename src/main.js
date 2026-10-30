@@ -15,6 +15,7 @@ const btnRotate = document.getElementById('btnRotate');
 const btnReset = document.getElementById('btnReset');
 const btnFullscreen = document.getElementById('btnFullscreen');
 const arBtn = document.getElementById('arBtn');
+const sceneAr = document.getElementById('sceneAr');
 const iosAr = document.getElementById('iosAr');
 const arNote = document.getElementById('arNote');
 const arOverlay = document.getElementById('arOverlay');
@@ -23,6 +24,7 @@ const arExit = document.getElementById('arExit');
 
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
   || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isAndroid = /Android/i.test(navigator.userAgent);
 const isTouch = matchMedia('(pointer: coarse)').matches;
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -276,9 +278,14 @@ function isMobileDevice() {
 }
 
 async function setupARAvailability() {
+  const glbUrl = new URL('model-android.glb', window.location.href).href;
+  sceneAr.href = 'https://arvr.google.com/scene-viewer/1.0'
+    + `?file=${encodeURIComponent(glbUrl)}&mode=ar_preferred&resizable=true&title=${encodeURIComponent('Table Alarm')}`;
+
   if (isIOS) {
     iosAr.hidden = false;
     arBtn.hidden = true;
+    sceneAr.hidden = true;
     arNote.classList.add('is-hidden');
     return;
   }
@@ -288,6 +295,7 @@ async function setupARAvailability() {
       const supported = await navigator.xr.isSessionSupported('immersive-ar');
       if (supported) {
         arBtn.hidden = false;
+        sceneAr.hidden = true;
         arNote.classList.add('is-hidden');
         return;
       }
@@ -297,9 +305,16 @@ async function setupARAvailability() {
   }
 
   arBtn.hidden = true;
+  if (isAndroid) {
+    sceneAr.hidden = false;
+    arNote.classList.remove('is-hidden');
+    arNote.textContent = 'Opens Google Scene Viewer · ARCore required.';
+    return;
+  }
+  sceneAr.hidden = true;
   arNote.classList.remove('is-hidden');
   arNote.textContent = isMobileDevice()
-    ? 'AR needs Chrome with ARCore. You can still explore the 3D model.'
+    ? 'AR needs a compatible browser with AR support. You can still explore the 3D model.'
     : 'Open on a phone to place the model in AR.';
 }
 
@@ -347,7 +362,12 @@ async function startAR() {
     arSession = null;
     arStarting = false;
     arOverlay.hidden = true;
-    arNote.textContent = 'AR could not start here. Try Chrome on Android with ARCore, or Safari on iPhone.';
+    if (isAndroid) {
+      sceneAr.hidden = false;
+      arNote.textContent = 'Tap View in AR to open Google Scene Viewer.';
+    } else {
+      arNote.textContent = 'AR could not start here. Try Safari on iPhone/iPad.';
+    }
     arNote.classList.remove('is-hidden');
   }
 }
